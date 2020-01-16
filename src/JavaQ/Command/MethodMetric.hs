@@ -14,27 +14,26 @@ MethodMetrics
 module JavaQ.Command.MethodMetric where
 
 -- base
-import GHC.Generics (Generic)
+import           GHC.Generics                   ( Generic )
 
 -- lens
-import Control.Lens
+import           Control.Lens
 
 -- aeson
-import qualified Data.Aeson                   as Json
-import qualified Data.Aeson.TH                as Json
+import qualified Data.Aeson                    as Json
+import qualified Data.Aeson.TH                 as Json
 
 -- cassava
-import qualified Data.Csv                     as Csv
+import qualified Data.Csv                      as Csv
 
 -- vector
-import qualified Data.Vector as V
+import qualified Data.Vector                   as V
 
 -- jvmhs
-import Jvmhs
-import Jvmhs.TypeCheck
+import           Jvmhs
 
 -- javaq
-import JavaQ.Command
+import           JavaQ.Command
 
 data MethodMetric = MethodMetric
   { mmClass :: ClassName
@@ -44,13 +43,16 @@ data MethodMetric = MethodMetric
 $(Json.deriveToJSON Json.defaultOptions{Json.fieldLabelModifier = Json.camelTo2 '_' . drop 2} ''MethodMetric)
 
 instance Csv.ToRecord MethodMetric where
-  toRecord = Csv.genericToRecord (Csv.defaultOptions { Csv.fieldLabelModifier = Json.camelTo2 '_' . drop 2 })
+  toRecord = Csv.genericToRecord
+    (Csv.defaultOptions { Csv.fieldLabelModifier = Json.camelTo2 '_' . drop 2 })
 
 instance Csv.ToNamedRecord MethodMetric where
-  toNamedRecord = Csv.genericToNamedRecord (Csv.defaultOptions { Csv.fieldLabelModifier = Json.camelTo2 '_' . drop 2 })
+  toNamedRecord = Csv.genericToNamedRecord
+    (Csv.defaultOptions { Csv.fieldLabelModifier = Json.camelTo2 '_' . drop 2 })
 
 instance Csv.DefaultOrdered MethodMetric where
-  headerOrder = Csv.genericHeaderOrder (Csv.defaultOptions { Csv.fieldLabelModifier = Json.camelTo2 '_' . drop 2 })
+  headerOrder = Csv.genericHeaderOrder
+    (Csv.defaultOptions { Csv.fieldLabelModifier = Json.camelTo2 '_' . drop 2 })
 
 
 methodmetricCmd :: CommandSpec
@@ -58,36 +60,29 @@ methodmetricCmd = CommandSpec
   "method-metrics"
   "A stream of method metrics."
   [ Json id
-  , Csv (Csv.headerOrder (undefined :: MethodMetric)) ((:[]). Csv.toRecord)
+  , Csv (Csv.headerOrder (undefined :: MethodMetric)) ((: []) . Csv.toRecord)
   ]
   (Stream Methods (return fn))
-  where
-    fn (cn, m) = MethodMetric cn (m^.methodId)
-
+  where fn (cn, m) = MethodMetric cn (m ^. methodId)
 
 typecheckCmd :: CommandSpec
 typecheckCmd = CommandSpec
   "typecheck"
   "Typecheck methods"
-  [ Json id
-  , Csv (V.fromList ["method", "type-check"]) ((:[]) . Csv.toRecord)
-  ]
+  [Json id, Csv (V.fromList ["method", "type-check"]) ((: []) . Csv.toRecord)]
   (Stream Methods fn)
-  where
-    fn = do
-      hry <- hierarchyFromStubs <$> loadJavaqStubs
-      return $ \(cn, (m :: Method)) ->
-        (mkAbsMethodId cn m
-        , let
-            result =
-              m^.methodCode <&> \code ->
-              typeCheck hry
+ where
+  fn = do
+    hry <- hierarchyFromStubs <$> loadJavaqStubs
+    return $ \(cn, (m :: Method)) ->
+      ( mkAbsMethodId cn m
+      , let result = m ^. methodCode <&> \code -> typeCheck
+              hry
               (mkAbsMethodId cn m)
-              (m^.methodAccessFlags.contains MStatic)
+              (m ^. methodAccessFlags . contains MStatic)
               code
-          in case result of
-            Just (Nothing, _)   -> "success" :: Csv.Field
-            Just (Just _, _)    -> "failure"
-            Nothing             -> "nocode"
-
-        )
+        in  case result of
+              Just (Nothing, _) -> "success" :: Csv.Field
+              Just (Just _ , _) -> "failure"
+              Nothing           -> "nocode"
+      )
