@@ -1,30 +1,26 @@
-{ mkDerivation, aeson, ansi-wl-pprint, base, base16-bytestring
-, binary, bytestring, cassava, containers, cryptohash-sha256
-, deepseq, fgl, filepath, hexstring, hpack, jvmhs, lens
-, lens-action, mtl, optparse-applicative, stdenv, text
-, unordered-containers, vector
-}:
-mkDerivation {
-  pname = "javaq";
-  version = "0.0.1";
-  src = ./.;
-  isLibrary = true;
-  isExecutable = true;
-  libraryHaskellDepends = [
-    aeson ansi-wl-pprint base base16-bytestring binary bytestring
-    cassava containers cryptohash-sha256 deepseq fgl filepath hexstring
-    jvmhs lens lens-action mtl optparse-applicative text
-    unordered-containers vector
-  ];
-  libraryToolDepends = [ hpack ];
-  executableHaskellDepends = [
-    aeson ansi-wl-pprint base base16-bytestring binary bytestring
-    cassava containers cryptohash-sha256 deepseq fgl filepath hexstring
-    jvmhs lens lens-action mtl optparse-applicative text
-    unordered-containers vector
-  ];
-  preConfigure = "hpack";
-  homepage = "https://github.com/ucla-pls/jvmhs#readme";
-  description = "A library for reading Java class-files";
-  license = stdenv.lib.licenses.bsd3;
-}
+{ pkgs ? import ./nix/nixpkgs.nix {}
+, compiler ? "default"
+, jvmhs ? import ./nix/jvmhs.nix 
+, jvm-binary ? import ./nix/jvm-binary.nix 
+}: 
+let 
+  haskellPackages = 
+    if compiler == "default" 
+    then pkgs.haskellPackages 
+    else pkgs.haskell.packages."${compiler}";
+in
+  haskellPackages.developPackage {
+    root = pkgs.lib.cleanSourceWith 
+      { filter = path: type: baseNameOf path != ".nix";
+        src = pkgs.lib.cleanSource ./.;
+      };
+    name = "javaq";
+    source-overrides = {
+      inherit jvmhs jvm-binary; 
+    };
+    overrides = hsuper: hself: { };
+    modifier = drv:
+      with pkgs.haskell.lib;
+      addBuildTools drv (with haskellPackages; [ cabal-install ghcid ])
+    ;
+  }
