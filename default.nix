@@ -11,7 +11,7 @@ let
 in
   haskellPackages.developPackage {
     root = pkgs.lib.cleanSourceWith 
-      { filter = path: type: baseNameOf path != ".nix";
+      { filter = path: type: ! (pkgs.lib.hasSuffix ".nix" path);
         src = pkgs.lib.cleanSource ./.;
       };
     name = "javaq";
