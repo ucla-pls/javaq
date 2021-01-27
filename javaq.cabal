@@ -1,0 +1,92 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.3.
+--
+-- see: https://github.com/sol/hpack
+
+name:           javaq
+version:        0.0.1
+synopsis:       A library for reading Java class-files
+description:    A tool for quering Java bytecode files.
+category:       Language, Java, JVM
+homepage:       https://github.com/ucla-pls/jvmhs#readme
+bug-reports:    https://github.com/ucla-pls/jvmhs/issues
+author:         Christian Gram Kalhauge
+maintainer:     Christian Gram Kalhauge <kalhauge@cs.ucla.edu>
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/ucla-pls/jvmhs
+
+library
+  exposed-modules:
+      JavaQ
+      JavaQ.Command
+      JavaQ.Command.Base
+      JavaQ.Command.ClassHierarchyAnalysis
+      JavaQ.Command.ClassMetric
+      JavaQ.Command.Hierarchy
+      JavaQ.Command.MethodMetric
+      JavaQ.Config
+  other-modules:
+      Paths_javaq
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson
+    , ansi-wl-pprint
+    , base >=4.10 && <4.13
+    , base16-bytestring
+    , binary
+    , bytestring
+    , cassava
+    , containers
+    , cryptohash-sha256
+    , deepseq
+    , fgl
+    , filepath
+    , hexstring
+    , jvmhs
+    , lens
+    , lens-action
+    , mtl
+    , optparse-applicative
+    , text
+    , unordered-containers
+    , vector
+  default-language: Haskell2010
+
+executable javaq
+  main-is: Main.hs
+  other-modules:
+      Paths_javaq
+  hs-source-dirs:
+      ./
+  ghc-options: -O2 -threaded
+  build-depends:
+      aeson
+    , ansi-wl-pprint
+    , base >=4.10 && <4.13
+    , base16-bytestring
+    , binary
+    , bytestring
+    , cassava
+    , containers
+    , cryptohash-sha256
+    , deepseq
+    , fgl
+    , filepath
+    , hexstring
+    , javaq
+    , jvmhs
+    , lens
+    , lens-action
+    , mtl
+    , optparse-applicative
+    , text
+    , unordered-containers
+    , vector
+  default-language: Haskell2010
