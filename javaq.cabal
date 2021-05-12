@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.3.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 
@@ -38,7 +38,7 @@ library
   build-depends:
       aeson
     , ansi-wl-pprint
-    , base >=4.10 && <4.13
+    , base >=4.10 && <4.15
     , base16-bytestring
     , binary
     , bytestring
@@ -48,7 +48,6 @@ library
     , deepseq
     , fgl
     , filepath
-    , hexstring
     , jvmhs
     , lens
     , lens-action
@@ -69,7 +68,7 @@ executable javaq
   build-depends:
       aeson
     , ansi-wl-pprint
-    , base >=4.10 && <4.13
+    , base >=4.10 && <4.15
     , base16-bytestring
     , binary
     , bytestring
@@ -79,7 +78,6 @@ executable javaq
     , deepseq
     , fgl
     , filepath
-    , hexstring
     , javaq
     , jvmhs
     , lens

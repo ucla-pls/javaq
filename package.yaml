@@ -12,7 +12,7 @@ category: Language, Java, JVM
 github: ucla-pls/jvmhs
 
 dependencies:
-  - base >= 4.10 && < 4.13
+  - base >= 4.10 && < 4.15
   - lens
   - lens-action
   - aeson
@@ -28,7 +28,6 @@ dependencies:
   - optparse-applicative
   - ansi-wl-pprint
   - mtl
-  - hexstring
   - vector
   - cassava
   - fgl

@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE ApplicativeDo             #-}
 {-# LANGUAGE DeriveGeneric             #-}
 {-# LANGUAGE ExistentialQuantification #-}
@@ -21,11 +20,10 @@ A command is one of many queries
 -}
 module JavaQ.Command where
 
--- hexstring
-import           Data.HexString
-
 -- bytestring
 import qualified Data.ByteString.Lazy.Char8   as BL
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Base16 as BS16
 
 -- lens
 import           Control.Lens                 hiding (argument, (.=))
@@ -35,6 +33,7 @@ import qualified Data.Aeson as Json
 
 -- text
 import qualified Data.Text                    as Text
+import qualified Data.Text.Encoding           as Text
 
 -- binary
 import Data.Binary
@@ -91,11 +90,7 @@ createClassLoaderWithClassPath ::
   -> m ClassLoader
 createClassLoaderWithClassPath cp =
   view cfgUseStdlib >>= \case
-    True ->
-      ( fromJreFolder
-        <$> pure cp
-        <*> view cfgJre
-      ) >>= liftIO
+    True -> liftIO . fromJreFolder cp =<< view cfgJre
     False ->
      pure $ ClassLoader [] [] cp
 
@@ -107,7 +102,7 @@ loadJavaqStubs ::
   => m HierarchyStubs
 loadJavaqStubs = do
   cache <- view cfgStdlibCache
-  cl <- liftIO =<< fromJreFolder [] <$> view cfgJre
+  cl <- liftIO . fromJreFolder [] =<< view cfgJre
   stdlib <- computeStubsWithCache cache cl
   scope <- computeStubs .ClassLoader [] [] =<< view cfgClassPath
   return (scope <> stdlib)
@@ -154,10 +149,9 @@ data Command = forall a. Command
   }
 
 mkCommand :: Text.Text -> Format a -> CommandType a -> Command
-mkCommand name fmt cmdType = Command
+mkCommand name fmt = Command
   (name <> "+" <> formatName fmt)
   fmt
-  cmdType
 
 instance Show Command where
   show x = "Command { commandName = " ++ show (commandName x) ++ " , ...}"
@@ -177,5 +171,18 @@ instance Csv.ToField FieldId where
 instance Csv.ToField ClassContainer where
   toField = Csv.toField . classContainerFilePath
 
+-- Borrowed from https://hackage.haskell.org/package/hexstring-0.11.1/docs/src/Data-HexString.html#toText
+newtype HexString = HexString { toBytes :: BS.ByteString }
+  deriving (Eq, Ord, Show)
+
+toText :: HexString -> Text.Text
+toText (HexString h) = Text.decodeUtf8 h
+
+fromBytes :: BS.ByteString -> HexString
+fromBytes = HexString . BS16.encode 
+
 instance Csv.ToField HexString where
   toField = Csv.toField . toText
+
+instance Json.ToJSON HexString where
+  toJSON = Json.String . toText

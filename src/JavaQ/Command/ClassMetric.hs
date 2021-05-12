@@ -16,9 +16,6 @@ import           Data.Word
 import           Data.Bifunctor
 import           GHC.Generics                   ( Generic )
 
--- hexstring
-import           Data.HexString
-
 -- cryptohash-sha256
 import           Crypto.Hash.SHA256            as SHA256
 
@@ -89,7 +86,7 @@ classmetricsCmd =
         Right cls -> ClassMetric
           { cmName         = cn
           , cmSize         = ln
-          , cmSha256       = fromBytes hsh
+          , cmSha256       = HexString hsh
           , cmFields       = cls ^. classFields . to length
           , cmMethods      = cls ^. classMethods . to length
           , cmInstructions = sumOf
