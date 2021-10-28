@@ -20,10 +20,12 @@ A command is one of many queries
 -}
 module JavaQ.Command where
 
+-- base
+import Numeric
+
 -- bytestring
 import qualified Data.ByteString.Lazy.Char8   as BL
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Base16 as BS16
 
 -- lens
 import           Control.Lens                 hiding (argument, (.=))
@@ -33,7 +35,6 @@ import qualified Data.Aeson as Json
 
 -- text
 import qualified Data.Text                    as Text
-import qualified Data.Text.Encoding           as Text
 
 -- binary
 import Data.Binary
@@ -172,17 +173,22 @@ instance Csv.ToField ClassContainer where
   toField = Csv.toField . classContainerFilePath
 
 -- Borrowed from https://hackage.haskell.org/package/hexstring-0.11.1/docs/src/Data-HexString.html#toText
-newtype HexString = HexString { toBytes :: BS.ByteString }
+newtype HexString = HexString { _toBytes :: BS.ByteString }
   deriving (Eq, Ord, Show)
 
 toText :: HexString -> Text.Text
-toText (HexString h) = Text.decodeUtf8 h
+toText (HexString h) =
+  Text.pack (BS.foldl' decoder id h "")
+ where
+  decoder a c = a . showHex c
 
 fromBytes :: BS.ByteString -> HexString
-fromBytes = HexString . BS16.encode 
+fromBytes = HexString 
 
 instance Csv.ToField HexString where
   toField = Csv.toField . toText
 
 instance Json.ToJSON HexString where
   toJSON = Json.String . toText
+
+
