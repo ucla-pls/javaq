@@ -5,10 +5,6 @@
     {
       nixpkgs.url = "github:NixOS/nixpkgs/21.05";
       flake-utils.url = "github:numtide/flake-utils";
-      recursion-schemes = { 
-        url = "https://hackage.haskell.org/package/recursion-schemes-5.2.2.1/recursion-schemes-5.2.2.1.tar.gz";
-        flake = false;
-      };
       hspec-hedgehog = { 
         url = "https://hackage.haskell.org/package/hspec-hedgehog-0.0.1.2/hspec-hedgehog-0.0.1.2.tar.gz";
         flake = false;
@@ -23,7 +19,7 @@
       };
     };
 
-  outputs = { self, nixpkgs, recursion-schemes, flake-utils 
+  outputs = { self, nixpkgs, flake-utils 
     , hspec-hedgehog, jvmhs, jvm-binary }:
     flake-utils.lib.eachSystem [ "x86_64-darwin" ] (system:
       let

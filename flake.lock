@@ -71,26 +71,13 @@
         "type": "github"
       }
     },
-    "recursion-schemes": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-1QlXWOm+IB1Y1Og2LHbJAC7IMa+eo8G8AP9bN1oo5Zc=",
-        "type": "tarball",
-        "url": "https://hackage.haskell.org/package/recursion-schemes-5.2.2.1/recursion-schemes-5.2.2.1.tar.gz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://hackage.haskell.org/package/recursion-schemes-5.2.2.1/recursion-schemes-5.2.2.1.tar.gz"
-      }
-    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "hspec-hedgehog": "hspec-hedgehog",
         "jvm-binary": "jvm-binary",
         "jvmhs": "jvmhs",
-        "nixpkgs": "nixpkgs",
-        "recursion-schemes": "recursion-schemes"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
